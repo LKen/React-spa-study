@@ -90,10 +90,12 @@ function useAuth() {
 
 function useProvideAuth() {
   const [user, setUser] = useState(null);
+  const [name, setName] = useState('chu');
 
   const signin = cb => {
     return fakeAuth.signin(() => {
       setUser("user");
+      setName('haha')
       cb();
     });
   };
@@ -101,12 +103,13 @@ function useProvideAuth() {
   const signout = cb => {
     return fakeAuth.signout(() => {
       setUser(null);
+      setName(null)
       cb();
     });
   };
 
   return {
-    name: 'chu',
+    name,
     user,
     signin,
     signout
@@ -119,7 +122,7 @@ function AuthButton() {
 
   return auth.user ? (
     <p>
-      Welcome!{" "}
+      Welcome!{" " + auth.name + "  "}
       <button
         onClick={() => {
           auth.signout(() => history.push("/"));
