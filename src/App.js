@@ -1,4 +1,5 @@
-import React, { createContext } from 'react'
+import React, { createContext, Profiler } from 'react'
+import ReactDOM from 'react-dom'
 import logo from './logo.svg';
 import './App.css';
 import Router from './router/r1'
@@ -59,11 +60,76 @@ class ThemedButton extends React.Component {
 //   );
 // }
 
+// eslint-disable-next-line no-unused-vars
 function Toolbar(props) {
   return (
     <ThemedButton onClick={props.changeTheme}>
       Change Theme
     </ThemedButton>
+  );
+}
+
+const modelRoot = document.getElementById('modal')
+
+class Modal extends React.Component {
+  constructor(props) {
+    super(props)
+    this.el = document.createElement('div')
+  }
+
+  componentDidMount() {
+    modelRoot.appendChild(this.el)
+  }
+
+  componentWillUnmount() {
+    modelRoot.removeChild(this.el)
+  }
+
+  render() {
+    return ReactDOM.createPortal(
+      this.props.children,
+      this.el
+    )
+  }
+}
+
+class Parent extends React.Component {
+  constructor(props) {
+    super(props)
+    this.state = { clicks: 0 }
+  }
+
+  handleClick = () => {
+    this.setState(preState => ({
+      clicks: preState.clicks + 1
+    }))
+  }
+
+  render() {
+    return (
+      <div onClick={this.handleClick}>
+        <p>Number of clicks: {this.state.clicks}</p>
+        <p>
+          Open up the browser DevTools
+          to observe that the button
+          is not a child of the div
+          with the onClick handler.
+        </p>
+        <Modal>
+          <Child />
+        </Modal>
+      </div>
+    )
+  }
+}
+
+function Child() {
+  // The click event on this button will bubble up to parent,
+  // because there is no 'onClick' attribute defined
+  return (
+    <div className="modal">
+      <button>Click</button>
+    </div>
   );
 }
 
@@ -98,6 +164,10 @@ class App extends React.Component {
     console.log(error, errorInfo);
   }
 
+  monitor(data) {
+    console.log(data);
+  }
+
 
   render() {
     return (
@@ -109,10 +179,9 @@ class App extends React.Component {
             className="App-link"
             href="https://reactjs.org"
             target="_blank"
-            rel="noopener noreferrer"
-          >
+            rel="noopener noreferrer">
             Learn React
-        </a>
+          </a>
 
           <Router />
 
@@ -132,7 +201,9 @@ class App extends React.Component {
               <Content />
             </ErrorBoundary>
           </ThemeContext.Provider>
-
+          <Profiler id="Portals" onRender={this.monitor}>
+            <Parent />
+          </Profiler>
         </header>
 
 
@@ -154,9 +225,9 @@ function Content() {
 
 class ThemeTogglerButton extends React.Component {
   render() {
-    setTimeout(() => {
-      throw new Error('I crashed!');
-    }, 3000)
+    // setTimeout(() => {
+    //   throw new Error('I crashed!');
+    // }, 3000)
     return (
       <ThemeContext.Consumer>
         {({ theme, toggleTheme }) => (
@@ -168,7 +239,7 @@ class ThemeTogglerButton extends React.Component {
               style={{ backgroundColor: theme.background }}>
               Toggle Theme
               </button>
-  
+
             <div>当前的颜色 {theme.background}</div>
           </div>
         )}
@@ -202,5 +273,7 @@ class ErrorBoundary extends React.Component {
     return this.props.children;
   }
 }
+
+
 
 export default App;
