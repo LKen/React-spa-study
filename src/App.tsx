@@ -37,6 +37,34 @@ function TestPropTypes(props: any) {
       optionalBool is: {props.optionalBool.toString()}
       <br />
       optionalString is: {props.optionalString.toString()}
+      <div
+        tabIndex={1}
+        onFocus={(e: React.FocusEvent) => {
+          if (e.currentTarget === e.target) {
+            console.log('focused self');
+          } else {
+            console.log('focused child', e.target);
+          }
+          if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+            // Not triggered when swapping focus between children
+            console.log('focus entered self');
+          }
+        }}
+        onBlur={(e: React.FocusEvent) => {
+          if (e.currentTarget === e.target) {
+            console.log('unfocused self');
+          } else {
+            console.log('unfocused child', e.target);
+          }
+          if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+            // Not triggered when swapping focus between children
+            console.log('focus left self');
+          }
+        }}
+      >
+        <input id="1" />
+        <input id="2" />
+      </div>
     </div>
   )
 }
@@ -44,14 +72,14 @@ function TestPropTypes(props: any) {
 TestPropTypes.propTypes = {
   // ? 详情参考 https://zh-hans.reactjs.org/docs/typechecking-with-proptypes.html
 
-   // 这些属性都是可选的。
-   optionalArray: PropTypes.array,
-   optionalBool: PropTypes.bool,
-   optionalFunc: PropTypes.func,
-   optionalNumber: PropTypes.number,
-   optionalObject: PropTypes.object,
-   optionalString: PropTypes.string,
-   optionalSymbol: PropTypes.symbol
+  // 这些属性都是可选的。
+  optionalArray: PropTypes.array,
+  optionalBool: PropTypes.bool,
+  optionalFunc: PropTypes.func,
+  optionalNumber: PropTypes.number,
+  optionalObject: PropTypes.object,
+  optionalString: PropTypes.string,
+  optionalSymbol: PropTypes.symbol
 }
 
 interface IState {
